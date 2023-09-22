@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue 3 Concepts</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.29/dist/vue.global.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Text Interpolation -->
+        <h1>{{ greeting }}</h1>
+
+        <!-- Raw HTML -->
+        <div v-html="htmlContent"></div>
+
+        <!-- Attribute Binding v-bind:id -->
+        <button :id="buttonId">Click Me</button>
+
+        <!-- JavaScript Expressions inside Syntax {{ }} -->
+        <p>{{ dynamicText }}</p>
+
+        <!-- Methods -->
+        <button @click="reverseGreeting">Reverse Greeting</button>
+
+        <!-- Computed Property -->
+        <p>Reversed Greeting: {{ reversedGreeting }}</p>
+
+        <!-- Class Binding -->
+        <div :class="classStyles">Class Binding</div>
+
+        <!-- Style Binding -->
+        <div :style="styleStyles">Style Binding</div>
+
+        <!-- List Rendering -->
+        <!-- v-for with an Object -->
+        <h2>{{ animalsTitle }}</h2>
+        <ul>
+            <li v-for="animal in animals" :key="animal.id">{{ animal.label }}</li>
+        </ul>
+
+        <!-- v-for with a Range -->
+        <ul>
+            <li v-for="n in 5" :key="n">Item {{ n }}</li>
+        </ul>
+
+        <!-- v-for on <template> and v-for with v-if -->
+        <h2>{{ sportsTitle }}</h2>
+        <ul>
+            <template v-for="sports in sportsList">
+                <li :key="sports.id" v-if="sports.showDescription">{{ sports.description }}</li>
+            </template>
+        </ul>
+
+        <!-- v-for with a Component -->
+        <ul>
+            <custom-clothing-item v-for="sportsItem in sportsList" :key="sportsItem.id" :item="sportsItem"></custom-clothing-item>
+        </ul>
+
+        <!-- Event Handling -->
+        <!-- Inline Handlers -->
+        <div class="event-handling">
+            <h2>Add Sports to List</h2>
+            <input type="text" v-model.trim="newSports" placeholder="Add a sport">
+            <button @click="addSportToList" class="btn">Add Sport</button>
+        </div>
+
+        <!-- Method Handlers -->
+        <button @click="handleButtonClick">Click me (Method)</button>
+
+        <!-- Form Input Bindings -->
+        <!-- Text Input -->
+        <div>
+            <label for="textInput">Text Input:</label>
+            <input type="text" id="textInput" v-model="textInputValue">
+            <p>Text Input Value: {{ textInputValue }}</p>
+        </div>
+
+        <!-- Checkbox -->
+        <div>
+            <label for="checkboxInput">Checkbox:</label>
+            <input type="checkbox" id="checkboxInput" v-model="checkboxValue">
+            <p>Checkbox Value: {{ checkboxValue }}</p>
+        </div>
+
+        <!-- Radio Buttons -->
+        <div>
+            <label for="radioInput1">Radio Button 1:</label>
+            <input type="radio" id="radioInput1" value="Option 1" v-model="radioValue">
+            <label for="radioInput2">Radio Button 2:</label>
+            <input type="radio" id="radioInput2" value="Option 2" v-model="radioValue">
+            <p>Selected Radio Value: {{ radioValue }}</p>
+        </div>
+
+        <!-- Select -->
+        <div>
+            <label for="selectInput">Select Dropdown:</label>
+            <select id="selectInput" v-model="selectedOption">
+                <option value="Option 1">Option 1</option>
+                <option value="Option 2">Option 2</option>
+                <option value="Option 3">Option 3</option>
+            </select>
+            <p>Selected Option: {{ selectedOption }}</p>
+        </div>
+
+        <!-- Text area -->
+        <div>
+            <label for="textareaInput">Textarea:</label>
+            <textarea id="textareaInput" v-model="textareaContent"></textarea>
+            <p>Text area Content: {{ textareaContent }}</p>
+        </div>
+
+        <!-- Lazy Modifier -->
+        <div>
+            <label for="lazyInput">Lazy Modifier:</label>
+            <input type="text" id="lazyInput" v-model.lazy="lazyInputValue">
+            <p>Lazy Input Value (Updated on Blur): {{ lazyInputValue }}</p>
+        </div>
+
+        <!-- Number Modifier -->
+        <div>
+            <label for="numberInput">Number Modifier:</label>
+            <input type="text" id="numberInput" v-model.number="numericInputValue">
+            <p>Numeric Input Value: {{ numericInputValue }}</p>
+        </div>
+
+        <!-- Watchers -->
+        <div>
+            <label for="watchTextInput">Watch Text Input:</label>
+            <input type="text" id="watchTextInput" v-model="watchedInputValue">
+            <p>Watched Input Value: {{ watchedInputValue }}</p>
+        </div>
+
+        <!-- Component Events [$emit] -->
+        <custom-component-with-event @custom-event="handleCustomEvent"></custom-component-with-event>
+        <p>Received Event Data: {{ eventData }}</p>
+
+        <!-- Slots -->
+        <custom-component-with-slot>
+            <template #custom-slot>
+                <p>Slot example</p>
+            </template>
+        </custom-component-with-slot>
+    </div>
+    <script>
+        const { ref, computed, watch } = Vue;
+
+        const app = Vue.createApp({
+            setup() {
+                // Text Interpolation
+                const greeting = ref("Hello, Vue!");
+
+                // Raw HTML
+                const htmlContent = ref("<p>This is <strong>raw HTML</strong></p>");
+
+                // Attribute Binding [v-bind:id]
+                const buttonId = ref("my-button");
+
+                // JavaScript Expressions inside Syntax [{{ }}]
+                const dynamicText = computed(() => {
+                    return greeting.value + ' Hello!';
+                });
+
+                // Method to reverse the greeting
+                const reverseGreeting = () => {
+                    greeting.value = greeting.value.split('').reverse().join('');
+                };
+
+                // Computed property to reverse the greeting
+                const reversedGreeting = computed(() => {
+                    return greeting.value.split('').reverse().join('');
+                });
+
+                // Class Binding
+                const classStyles = {
+                    active: true,
+                    'text-danger': false
+                };
+
+                // Style Binding
+                const styleStyles = {
+                    color: 'blue',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                };
+
+                // List Rendering
+                const animalsTitle = ref('animals');
+                const animals = ref([
+                    { id: 1, label: "tiger" },
+                    { id: 2, label: "cheetah" },
+                    { id: 3, label: "panther" }
+                ]);
+
+                const sportsTitle = ref('sports');
+                const sportsList = ref([
+                    { id: 1, description: "boxing", showDescription: false },
+                    { id: 2, description: "mma", showDescription: true },
+                    { id: 3, description: "bowling", showDescription: true }
+                ]);
+
+                // Method Click Handler
+                const methodClickHandler = () => {
+                    alert("Button clicked (Method Handler)");
+                };
+
+                // Form Input Bindings
+                // Text Input
+                const textInputValue = ref("");
+                
+                // Checkbox
+                const checkboxValue = ref(false);
+                
+                // Radio Buttons
+                const radioValue = ref("Option 1");
+                
+                // Select
+                const selectedOption = ref("Option 1");
+                
+                // Textarea
+                const textareaContent = ref("");
+                
+                // Lazy Modifier
+                const lazyInputValue = ref("");
+                
+                // Number Modifier
+                const numericInputValue = ref(0);
+                
+                // Watchers
+                const watchedInputValue = ref("");
+                Vue.watch(watchedInputValue, (newValue, oldValue) => {
+                    alert(`Input value changed from "${oldValue}" to "${newValue}"`);
+                });
+
+                // Component
+                const eventData = ref("");
+
+                // Event handler to receive data from child component
+                const handleCustomEvent = (data) => {
+                    eventData.value = data;
+                };
+
+                // Add Sports to List
+                const newSports = ref("");
+                const addSportToList = () => {
+                    if (newSports.value.trim() !== "") {
+                        sportsList.value.push({ id: sportsList.value.length + 1, description: newSports.value, showDescription: true });
+                        newSports.value = "";
+                    }
+                };
+
+                return {
+                    greeting,
+                    htmlContent,
+                    buttonId,
+                    dynamicText,
+                    reverseGreeting,
+                    reversedGreeting,
+                    classStyles,
+                    styleStyles,
+                    animalsTitle,
+                    animals,
+                    sportsTitle,
+                    sportsList,
+                    methodClickHandler,
+                    textInputValue,
+                    checkboxValue,
+                    radioValue,
+                    selectedOption,
+                    textareaContent,
+                    lazyInputValue,
+                    numericInputValue,
+                    watchedInputValue,
+                    eventData,
+                    handleCustomEvent,
+                    newSports,
+                    addSportToList
+                };
+            }
+        });
+
+        // Component props
+        app.component('custom-clothing-item', {
+            props: ['item'],
+            template: '<li>{{ item.description }} (Custom Design)</li>'
+        });
+
+        // Component event
+        app.component('custom-component-with-event', {
+            template: `
+                <div>
+                    <h2>Custom Component with Event:</h2>
+                    <button @click="emitCustomEvent">Emit Event</button>
+                </div>
+            `,
+            methods: {
+                emitCustomEvent() {
+                    this.$emit('custom-event', 'example');
+                }
+            }
+        });
+
+        // Define a component with slots
+        app.component('custom-component-with-slot', {
+            template: `
+                <div>
+                    <h2>Custom Component with Slot:</h2>
+                    <slot name="custom-slot"></slot>
+                </div>
+            `
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>
+
+
+
+
